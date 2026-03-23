@@ -336,7 +336,7 @@
         <div class="scenario-switcher">
           <button class="scenario-btn active" data-scenario="parent">Parent Org View<br><small>SIL Pacific (15 sub-organisations)</small></button>
           <button class="scenario-btn" data-scenario="suborg-opted-in">Sub-Org View: Opted in by Parent<br><small>Finisterre Vision</small></button>
-          <button class="scenario-btn" data-scenario="suborg-independent">Sub-Org View: Independent<br><small>Parent excluded / hasn't acted</small></button>
+          <button class="scenario-btn" data-scenario="suborg-independent">Independent org or sub-org<br><small>If sub-org, parent hasn't enabled</small></button>
         </div>
 
         <!-- ======== PARENT ORG VIEW ======== -->
@@ -735,6 +735,28 @@
     </div>
   </div>
 
+  <!-- ==================== DISABLE BACKUP MODAL (Independent org / sub-org) ==================== -->
+  <div class="modal-overlay" id="disableBackupIndependentModal">
+    <div class="modal-dialog" style="max-width: 480px;">
+      <div class="modal-header" style="background: #fcf8e3; border-bottom: 1px solid #f0e0a0;">
+        <h3 style="color: #8a6d3b;">&#9888; Disable Service Continuity Backup?</h3>
+        <button class="modal-close js-close-disable-independent-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 12px;">
+          Your organisation's data will <strong>no longer be included</strong> in the independent service continuity backup.
+        </p>
+        <p style="margin-bottom: 0; font-size: 13px; color: #666;">
+          You can re-enable this at any time.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default js-close-disable-independent-modal">Cancel</button>
+        <button class="btn btn-warning" id="btnConfirmDisableIndependent">Disable Backup</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== JAVASCRIPT ==================== -->
   <script src="./shared-shim.js"></script>
   <script>
@@ -829,24 +851,40 @@
         }
       },
 
-      // Confirm disable from modal
+      // Confirm disable from parent modal
       'click #btnConfirmDisable': function(event, instance) {
         var modal = document.getElementById('disableBackupModal');
         var toggleId = modal._sourceToggleId || 'scToggle';
         document.getElementById(toggleId).checked = false;
-        // Hide relevant consent record
         if (toggleId === 'scToggle') {
           instance.scEnabled.set(false);
           document.getElementById('scConsentRecord').style.display = 'none';
-        } else if (toggleId === 'scIndependentToggle') {
-          document.getElementById('scIndependentConsentRecord').style.display = 'none';
         }
         modal.classList.remove('active');
       },
 
-      // Close disable modal (cancel)
+      // Close parent disable modal (cancel)
       'click .js-close-disable-modal': function(event) {
         document.getElementById('disableBackupModal').classList.remove('active');
+      },
+
+      // Confirm disable from independent/sub-org modal
+      'click #btnConfirmDisableIndependent': function(event, instance) {
+        var modal = document.getElementById('disableBackupIndependentModal');
+        var toggleId = modal._sourceToggleId || 'scIndependentToggle';
+        document.getElementById(toggleId).checked = false;
+        if (toggleId === 'scIndependentToggle') {
+          document.getElementById('scIndependentConsentRecord').style.display = 'none';
+        }
+        modal._sourceToggleId = null;
+        modal.classList.remove('active');
+      },
+
+      // Close independent disable modal (cancel)
+      'click .js-close-disable-independent-modal': function(event) {
+        var modal = document.getElementById('disableBackupIndependentModal');
+        modal._sourceToggleId = null;
+        modal.classList.remove('active');
       },
 
       // Apply to sub-orgs — show confirmation modal
@@ -925,7 +963,7 @@
       'change #scSubOrgToggle': function(event, instance) {
         if (!event.currentTarget.checked) {
           event.currentTarget.checked = true;
-          var modal = document.getElementById('disableBackupModal');
+          var modal = document.getElementById('disableBackupIndependentModal');
           modal._sourceToggleId = 'scSubOrgToggle';
           modal.classList.add('active');
         }
@@ -938,9 +976,9 @@
           document.getElementById('scIndependentConsentDate').textContent = now.toISOString().slice(0, 19).replace('T', ' ') + ' UTC';
           record.style.display = 'block';
         } else {
-          // Show confirmation modal instead of immediately disabling
+          // Show independent-specific confirmation modal
           event.currentTarget.checked = true;
-          var modal = document.getElementById('disableBackupModal');
+          var modal = document.getElementById('disableBackupIndependentModal');
           modal._sourceToggleId = 'scIndependentToggle';
           modal.classList.add('active');
         }
@@ -953,6 +991,9 @@
         if (e.target === this) this.classList.remove('active');
       });
       document.getElementById('applySubOrgsModal').addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('active');
+      });
+      document.getElementById('disableBackupIndependentModal').addEventListener('click', function(e) {
         if (e.target === this) this.classList.remove('active');
       });
     });
