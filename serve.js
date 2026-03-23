@@ -17,7 +17,7 @@ const MIME = {
 
 http.createServer((req, res) => {
   let url = req.url.split('?')[0];
-  if (url === '/') url = '/index.html';
+  if (url === '/') url = '/org-profile.html';
   const filePath = path.join(BASE, url);
   const ext = path.extname(filePath);
   fs.readFile(filePath, (err, data) => {

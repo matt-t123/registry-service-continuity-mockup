@@ -89,11 +89,10 @@ The mockup uses the same `Template.name.events / helpers / onCreated / onRendere
 ```
 registry-service-continuity-mockup/
 ├── mockups/
-│   ├── index.html            # Navigation hub
 │   ├── org-profile.html      # Org admin page with Service Continuity tab
 │   ├── shared.css            # Common styles matching Registry
 │   └── shared-shim.js        # Blaze compatibility shim (delete in Meteor)
-├── serve.js                  # Simple Node.js static file server
+├── serve.js                  # Simple Node.js static file server (serves org-profile.html at /)
 ├── package.json
 └── HANDOFF.md                # This file
 ```
