@@ -1,0 +1,9 @@
+{
+  "name": "registry-service-continuity-mockup",
+  "version": "1.0.0",
+  "description": "Blaze-ready HTML mockup for Paratext Registry Service Continuity Backup opt-in (org-level)",
+  "scripts": {
+    "start": "node serve.js"
+  },
+  "private": true
+}
